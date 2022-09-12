@@ -72,6 +72,10 @@ module Aux
         errors.empty?
       end
 
+      def map(&block)
+        errors.map(&block)
+      end
+
       private
 
       # @!attribute [rw] errors
