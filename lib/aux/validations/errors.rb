@@ -27,7 +27,7 @@ module Aux
 
       # @return [Hash]
       def details
-        details_presenter.render(errors)
+        details_presenter.render(self)
       end
 
       # @return [Hash]
