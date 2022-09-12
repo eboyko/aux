@@ -3,6 +3,7 @@
 require 'aux/validations/errors'
 
 module Aux
+  # Describes enhancement of {ActiveModel::Validations}
   module Validations
     extend ActiveSupport::Concern
     include ActiveModel::Validations

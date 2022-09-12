@@ -1,12 +1,18 @@
 # frozen_string_literal: true
 
 require 'aux/validations/error'
-require 'aux/validations/errors_presenter'
+require 'aux/validations/errors_tree_presenter'
 
 module Aux
   module Validations
     # Describes a batch of errors that can be initialized using an attribute name or an object that should be validated
     class Errors
+      # @!attribute [r] scope
+      #   @return [String, nil]
+      # @!attribute [r] attribute
+      #   @return [Symbol, nil]
+      attr_reader :scope, :attribute
+
       # @overload initialize(subject)
       #   @param base [Object]
       #   @return [self]
@@ -16,33 +22,9 @@ module Aux
       #   @param errors [Aux::Validation::Errors]
       #   @return [self]
       def initialize(base, errors = [])
-        @base = base
+        @scope = base.is_a?(Symbol) ? nil : base.class.name.underscore.tr('/', '.')
+        @attribute = base.is_a?(Symbol) ? base : nil
         @errors = errors
-      end
-
-      # @return [Symbol, nil]
-      def attribute
-        base if base.is_a?(Symbol)
-      end
-
-      # @return [Hash]
-      def details
-        details_presenter.render(self)
-      end
-
-      # @return [Hash]
-      def group_by_attribute
-        errors.group_by { |error| error.attribute }
-      end
-
-      # @return [Boolean]
-      def nested?
-        base.is_a?(Symbol)
-      end
-
-      # @return [String, nil]
-      def scope
-        base.class.name.underscore.gsub('/', '.') unless nested?
       end
 
       # @overload add(attribute, type, **details)
@@ -52,17 +34,33 @@ module Aux
       #   @raise [StandardError]
       # @overload add(attribute, errors)
       #   @param attribute [Symbol]
+      #   @param errors [Array<Aux::Validations::Errors, Aux::Validations::Error>]
+      #   @raise [StandardError]
+      # @overload add(attribute, errors)
+      #   @param attribute [Symbol]
       #   @param errors [Aux::Validations::Errors]
       #   @raise [StandardError]
       def add(attribute, payload, **details)
         case payload
-        when Aux::Validations::Errors
-          add_nested_error(attribute, payload)
         when Symbol
           add_error(attribute, payload, **details)
+        when Array
+          add_nested_error(attribute, payload)
+        when Aux::Validations::Errors
+          add_nested_error(attribute, [payload])
         else
           raise StandardError, :unsupported_type
         end
+      end
+
+      # @return [Hash]
+      def tree
+        tree_presenter.render(self)
+      end
+
+      # @return [Hash]
+      def group_by_attribute
+        errors.group_by(&:attribute)
       end
 
       def clear
@@ -75,10 +73,6 @@ module Aux
       end
 
       private
-
-      # @!attribute [r] base
-      #   @return [Object, Symbol]
-      attr_reader :base
 
       # @!attribute [rw] errors
       #   @return [Array<Aux::Validations::Errors, Aux::Validations::Error>]
@@ -102,24 +96,24 @@ module Aux
       # @param details [Hash]
       # @return [Aux::Validations::Error]
       def build_error(attribute, type, **details)
-        errors_factory.new(attribute, type, scope, **details.compact)
+        errors_factory.new(attribute, type, scope, **details)
       end
 
       # @param attribute [Symbol] 3
       # @param errors [Aux::Validations::Errors]
       # @return [Aux::Validations::Errors]
       def build_nested_error(attribute, errors)
-        self.class.new(attribute, [errors])
+        self.class.new(attribute, errors)
+      end
+
+      # @return [Class<Aux::Validations::ErrorsTreePresenter>]
+      def tree_presenter
+        Aux::Validations::ErrorsTreePresenter
       end
 
       # @return [Class<Aux::Validations::Error>]
       def errors_factory
         Aux::Validations::Error
-      end
-
-      # @return [Class<Aux::Validations::ErrorsPresenter>]
-      def details_presenter
-        Aux::Validations::ErrorsPresenter
       end
     end
   end

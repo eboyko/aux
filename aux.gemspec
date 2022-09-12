@@ -13,6 +13,8 @@ Gem::Specification.new do |specification|
   specification.add_dependency 'activemodel', '~> 6.1.6'
   specification.add_dependency 'activesupport', '~> 6.1.6'
 
+  specification.add_development_dependency 'rubocop', '~> 1.36.0'
+
   specification.required_ruby_version = '>= 2.7.1'
   specification.metadata['rubygems_mfa_required'] = 'true'
 
