@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    aux (0.1.0)
+    aux (0.0.1)
       activemodel (~> 6.1.6)
       activesupport (~> 6.1.6)
 
