@@ -76,6 +76,17 @@ module Aux
         errors.map(&block)
       end
 
+      # @return [Array<Aux::Validations::Error>]
+      def all
+        errors.map do |error|
+          if error.is_a?(Array)
+            error.map { |e| e.respond_to?(:all) ? e.all : e }
+          else
+            error.respond_to?(:all) ? error.all : error
+          end
+        end.flatten
+      end
+
       private
 
       # @!attribute [rw] errors
