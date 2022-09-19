@@ -3,7 +3,6 @@ PATH
   specs:
     aux (0.0.3)
       activemodel (~> 6.1.6)
-      activesupport (~> 6.1.6)
 
 GEM
   remote: https://rubygems.org/
