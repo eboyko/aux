@@ -39,8 +39,8 @@ module Aux
 
       # @param cipher [Symbol, String]
       # @param as [Symbol, String]
-      def resolve(cipher, as: nil)
-        namespace = Aux::Utilities.underscore(name).split('.')[0..-2].join('.')
+      def resolve(cipher, as: nil, scope: :local)
+        namespace = scope == :local ? Aux::Utilities.underscore(name).split('.')[0..-2].join('.') : nil
         @_dependencies[as || cipher] = [namespace, cipher].compact.join('.')
       end
     end
