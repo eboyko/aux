@@ -11,6 +11,8 @@ Gem::Specification.new do |specification|
   specification.homepage = 'https://github.com/eboyko/aux'
 
   specification.add_dependency 'activemodel', '~> 6.1.6'
+
+  specification.add_development_dependency 'dry-container', '~> 0.11.0'
   specification.add_development_dependency 'rubocop', '~> 1.36.0'
 
   specification.required_ruby_version = '>= 2.7.1'
