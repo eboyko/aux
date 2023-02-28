@@ -82,12 +82,12 @@ module Aux
             end
           end
 
-          # private dependency_alias
+          private dependency_alias
         end
 
         singleton_class.class_eval do
           define_method(dependency_alias) { dependency.call }
-          # private dependency_alias
+          private dependency_alias
         end
       end
       # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
