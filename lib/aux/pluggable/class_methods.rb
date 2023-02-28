@@ -58,7 +58,7 @@ module Aux
         # This allows us not to worry about the absence of the referenced class in the registry during assembly.
         # Using an initialization block can be convenient in some cases, for example, to resolve some
         # of the global settings without accessing the whole thing.
-        dependency_cipher = [scope, code].reject(&:empty?).join('.')
+        dependency_cipher = [scope, code].reject { |part| part.nil? || part.empty? }.join('.')
         dependency =
           if initialization_block
             -> { initialization_block.call(@_registry.resolve(dependency_cipher)) }
@@ -82,12 +82,12 @@ module Aux
             end
           end
 
-          private dependency_alias
+          # private dependency_alias
         end
 
         singleton_class.class_eval do
           define_method(dependency_alias) { dependency.call }
-          private dependency_alias
+          # private dependency_alias
         end
       end
       # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
