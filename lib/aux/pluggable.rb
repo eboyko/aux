@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'aux/pluggable/class_methods'
+require 'aux/pluggable/registration'
 
 module Aux
   # Describes interface that makes any class able to register itself as well as resolve dependencies
