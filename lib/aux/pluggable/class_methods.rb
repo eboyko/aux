@@ -6,7 +6,7 @@ module Aux
     module ClassMethods
       # @param dependencies [Hash{Symbol => Object}]
       def new(**dependencies)
-        instance = allocate
+        instance = super || allocate
 
         # Configure dependencies that come from the registry
         @_dependencies.each do |name, dependency|
@@ -17,9 +17,6 @@ module Aux
         dependencies.each do |name, dependency|
           instance.instance_variable_set("@#{name}", dependency) if @_dependencies.include?(name)
         end
-
-        # Run the rest of customized initialization procedure
-        instance.send(:initialize, **dependencies)
 
         instance
       end
@@ -73,6 +70,7 @@ module Aux
           private dependency_alias
         end
       end
+
       # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
     end
   end

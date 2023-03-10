@@ -1,15 +1,15 @@
 PATH
   remote: .
   specs:
-    aux (0.0.5)
+    aux (0.0.6)
       activemodel (~> 6.1.6)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (6.1.7)
-      activesupport (= 6.1.7)
-    activesupport (6.1.7)
+    activemodel (6.1.7.1)
+      activesupport (= 6.1.7.1)
+    activesupport (6.1.7.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
@@ -22,7 +22,7 @@ GEM
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
     json (2.6.2)
-    minitest (5.16.3)
+    minitest (5.17.0)
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
@@ -45,7 +45,7 @@ GEM
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.2.0)
-    zeitwerk (2.6.0)
+    zeitwerk (2.6.6)
 
 PLATFORMS
   ruby
