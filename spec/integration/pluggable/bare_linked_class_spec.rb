@@ -1,7 +1,7 @@
 require 'pluggable_helper'
 
 RSpec.describe(BareLinkedClass) do
-  let(:registry) { Aux::Pluggable.registry }
+  include_context 'with pluggable registry'
 
   it 'includes the connector' do
     expect(described_class.instance_variable_get(:@_pluggable)).to be_truthy
