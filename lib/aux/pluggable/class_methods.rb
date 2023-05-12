@@ -26,7 +26,7 @@ module Aux
           # by its reader methods within customized initialization
           #
           # TODO: Discuss whether this is appropriate behaviour
-          next if instance.respond_to?(dependency.pointer)
+          next if instance.respond_to?(dependency.pointer, true)
 
           define_method(dependency.pointer) { instance_variable_get("@#{dependency.pointer}") }
           next unless dependency.private
