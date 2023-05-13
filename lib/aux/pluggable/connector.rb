@@ -41,19 +41,12 @@ module Aux
       # @param namespace [TrueClass, Symbol, String, nil] whether to resolve the dependency in the same namespace
       # @param private [TrueClass, FalseClass] whether to make the dependency private
       # @param as [Symbol] an internal alias name for the dependency
-      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+      # rubocop:disable Layout/LineLength, Metrics/AbcSize, Metrics/MethodLength
       def resolve(code, initialization_block = nil, namespace: true, private: true, as: nil)
         cipher = Utilities.dependency_cipher(@subject.name, scope: namespace, code: code)
         load_class(cipher) unless @registry.key?(cipher)
 
-        target =
-          if initialization_block
-            -> { initialization_block.call(@registry.resolve(cipher)) }
-          else
-            -> { @registry.resolve(cipher) }
-          end
-
-        dependency = Dependency.new(target: target, pointer: as || code, private: private)
+        dependency = Dependency.new(@registry.resolve(cipher), initialization_block, pointer: as || code, private: private)
         @dependencies.push(dependency)
 
         if @initialization_required
@@ -69,7 +62,7 @@ module Aux
           end
         end
       end
-      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength, Metrics/PerceivedComplexity
+      # rubocop:enable Layout/LineLength, Metrics/AbcSize, Metrics/MethodLength
 
       private
 
