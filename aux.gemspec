@@ -10,9 +10,10 @@ Gem::Specification.new do |specification|
   specification.email = ['eboyko@eboyko.ru']
   specification.homepage = 'https://github.com/eboyko/aux'
 
-  specification.add_dependency 'activemodel', '~> 6.1.6'
+  specification.add_dependency 'activemodel', '>= 6.1', '< 8'
+  specification.add_dependency 'dry-container', '>= 0.9.0', '<= 0.11'
 
-  specification.add_development_dependency 'dry-container', '~> 0.11.0'
+  specification.add_development_dependency 'zeitwerk', '~> 2.5'
   specification.add_development_dependency 'rubocop', '~> 1.36.0'
 
   specification.required_ruby_version = '>= 2.7.1'

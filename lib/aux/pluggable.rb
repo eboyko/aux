@@ -1,18 +1,21 @@
 # frozen_string_literal: true
 
 require 'aux/pluggable/class_methods'
+require 'aux/pluggable/connector'
+require 'aux/pluggable/dependency'
 require 'aux/pluggable/utilities'
 
 module Aux
   # Describes interface that makes any class able to register itself as well as resolve dependencies
+  # rubocop:disable Style/ClassVars
   module Pluggable
-    # @param base [Class]
+    # Extends the including class with ClassMethods and initializes a new Connector instance
+    # @param base [Class] the class that includes this module
     def self.included(base)
       base.extend(ClassMethods)
 
       base.class_eval do
-        @_registry = @@registry
-        @_dependencies = {}
+        @_pluggable = Connector.new(self, @@registry)
       end
     end
 
@@ -26,4 +29,5 @@ module Aux
       @@registry
     end
   end
+  # rubocop:enable Style/ClassVars
 end

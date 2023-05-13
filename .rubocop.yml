@@ -4,6 +4,7 @@ AllCops:
   Exclude:
     - Gemfile
     - aux.gemspec
+    - spec/**/*
 
 Layout/LineLength:
   Max: 120
