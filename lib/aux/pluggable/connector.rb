@@ -85,7 +85,11 @@ module Aux
       # @return [Class] the loaded class
       def load_class(cipher)
         cipher.split('.').reduce(Object) do |namespace, class_name|
-          namespace.const_get(class_name.split('_').map(&:capitalize).join)
+          if defined?(ActiveSupport::Inflector)
+            namespace.const_get(class_name.camelcase)
+          else
+            namespace.const_get(class_name.split('_').map(&:capitalize).join)
+          end
         end
       end
     end
