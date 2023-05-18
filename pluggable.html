@@ -518,6 +518,10 @@
 <h1 id="the-pluggable">The Pluggable</h1>
 <h2 id="convention-and-restrictions">Convention and restrictions</h2>
 <p>Your application needs to use Zeitwerk as a code loader and follow its <a href="https://github.com/fxn/zeitwerk#file-structure">file structure conventions</a>. It would help to find correct classes and their files when resolving dependencies. The latest version of Rails uses it by default, so this shouldn't be a problem.</p>
+<div class="admonition tip">
+<p class="admonition-title">Inflections support</p>
+<p>Version <code>0.1.1</code> introduces experimental support for inflections defined with <code>ActiveSupport::Inflections</code> in Rails applications. This allows you to load the correct classes when resolving, even when using non-standard class names like <code>HTTP</code>, <code>HTMLParser</code>, etc.</p>
+</div>
 <h2 id="the-cipher-convention">The cipher convention</h2>
 <p>The key principle of the Pluggable module is the <em>cipher</em>. Each dependency must provide its cipher to be registered.</p>
 <p>By default, the cipher is generated using the full class name. Converting the class name to the cipher is simple: camel case is converted to snake case, and separators are replaced with dots.</p>
