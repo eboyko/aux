@@ -4,6 +4,7 @@ require 'aux/pluggable/class_methods'
 require 'aux/pluggable/connector'
 require 'aux/pluggable/dependency'
 require 'aux/pluggable/utilities'
+require 'aux/registry'
 
 module Aux
   # Describes interface that makes any class able to register itself as well as resolve dependencies
