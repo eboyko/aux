@@ -1,0 +1,25 @@
+name: RSpec
+permissions:
+  contents: read
+on:
+  push:
+    branches:
+      - *
+  pull_request:
+    branches:
+      - *
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby-version: [ '2.7', '3.0', '3.1', '3.2' ]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up
+        uses: ruby/setup-ruby@55283cc23133118229fd3f97f9336ee23a179fcf # v1.146.0
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+      - name: Run
+        run: bundle exec rspec
