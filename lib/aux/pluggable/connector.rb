@@ -9,7 +9,7 @@ module Aux
       attr_reader :dependencies
 
       # @param subject [Class]
-      # @param registry [Dry::Container]
+      # @param registry [Aux::Registry]
       def initialize(subject, registry)
         @subject = subject
         @registry = registry
@@ -44,7 +44,7 @@ module Aux
       # rubocop:disable Layout/LineLength, Metrics/AbcSize, Metrics/MethodLength
       def resolve(code, initialization_block = nil, namespace: true, private: true, as: nil)
         cipher = Utilities.dependency_cipher(@subject.name, scope: namespace, code: code)
-        load_class(cipher) unless @registry.key?(cipher)
+        load_class(cipher)
 
         dependency = Dependency.new(@registry.resolve(cipher), initialization_block, pointer: as || code, private: private)
         @dependencies.push(dependency)
