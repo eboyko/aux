@@ -14,21 +14,14 @@ module Aux
         @subject = subject
         @registry = registry
         @dependencies = []
-
-        configure
       end
 
-      # @param initialization_required [Boolean] whether the subject requires initialization before use
-      # @param memoization_required [Boolean] whether the subject should be memoized
-      # @param namespace [Symbol] the namespace to register the subject
-      # @param code [Symbol] an alternate name
-      def register(initialization_required: nil, memoization_required: nil, namespace: nil, code: nil)
-        configure(
-          initialization_required: initialization_required,
-          memoization_required: memoization_required,
-          namespace: namespace,
-          code: code
-        )
+      # @param initialization_required [TrueClass, FalseClass] whether the subject requires initialization before use
+      # @param memoization_required [TrueClass, FalseClass] whether the subject should be memoized
+      # @param namespace [Symbol, String, TrueClass, nil] the namespace to register the subject
+      # @param code [Symbol, String, nil] an alternate name
+      def register(initialization_required, memoization_required, namespace, code)
+        configure(initialization_required, memoization_required, namespace, code)
 
         # Register the subject in the registry using the provided options
         @registry.register(@cipher, memoize: @memoization_required) do
@@ -37,16 +30,16 @@ module Aux
       end
 
       # @param code [Symbol, String] the name of the dependency
-      # @param initialization_block [Proc] an optional block used to initialize the dependency
-      # @param namespace [TrueClass, Symbol, String, nil] whether to resolve the dependency in the same namespace
+      # @param namespace [Symbol, String, TrueClass, nil] whether to resolve the dependency in the same namespace
       # @param private [TrueClass, FalseClass] whether to make the dependency private
-      # @param as [Symbol] an internal alias name for the dependency
-      # rubocop:disable Layout/LineLength, Metrics/AbcSize, Metrics/MethodLength
-      def resolve(code, initialization_block = nil, namespace: true, private: true, as: nil)
-        cipher = Utilities.dependency_cipher(@subject.name, scope: namespace, code: code)
+      # @param as [Symbol, String, nil] an internal alias name for the dependency
+      # @param initialization_block [Proc, nil] an optional block used to initialize the dependency
+      # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+      def resolve(code, namespace, private, as, initialization_block = nil)
+        cipher = Utilities.dependency_cipher(@subject.name, namespace, code)
         load_class(cipher)
 
-        dependency = Dependency.new(@registry.resolve(cipher), initialization_block, pointer: as || code, private: private)
+        dependency = Dependency.new(@registry.resolve(cipher), as || code, private, initialization_block)
         @dependencies.push(dependency)
 
         if @initialization_required
@@ -62,16 +55,16 @@ module Aux
           end
         end
       end
-      # rubocop:enable Layout/LineLength, Metrics/AbcSize, Metrics/MethodLength
+      # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
       private
 
-      # @param initialization_required [TrueClass, FalseClass, nil]
-      # @param memoization_required [TrueClass, FalseClass, nil]
-      # @param namespace [Symbol, String, nil]
+      # @param initialization_required [TrueClass, FalseClass]
+      # @param memoization_required [TrueClass, FalseClass]
+      # @param namespace [TrueClass, Symbol, String, nil]
       # @param code [Symbol, String, nil]
-      def configure(initialization_required: nil, memoization_required: nil, namespace: nil, code: nil)
-        @cipher = Utilities.dependency_cipher(@subject.name, scope: namespace, code: code)
+      def configure(initialization_required, memoization_required, namespace, code)
+        @cipher = Utilities.dependency_cipher(@subject.name, namespace, code)
         @initialization_required = initialization_required
         @memoization_required = memoization_required
         @namespace = namespace

@@ -8,11 +8,11 @@ module Aux
       # By default, we assume that the developers want to resolve a dependency from the same namespace as the
       # referencing class. Another approach is to allow developers to set the correct scope themselves.
       #
-      # @param subject [ClassName]
-      # @param scope [TrueClass, Symbol, String, nil]
-      # @param code [TrueClass, Symbol, String, nil]
+      # @param subject [String]
+      # @param scope [Symbol, String, TrueClass, nil]
+      # @param code [Symbol, String, nil]
       # @return [String]
-      def self.dependency_cipher(subject, scope: nil, code: nil)
+      def self.dependency_cipher(subject, scope, code)
         native_cipher = dependency_native_cipher(subject)
         native_cipher_partitions = native_cipher.rpartition('.')
         scope = scope == true ? native_cipher_partitions.first : scope
