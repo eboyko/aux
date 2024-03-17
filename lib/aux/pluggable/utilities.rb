@@ -15,8 +15,8 @@ module Aux
       def self.dependency_cipher(subject, scope, code)
         native_cipher = dependency_native_cipher(subject)
         native_cipher_partitions = native_cipher.rpartition('.')
-        scope = scope == true ? native_cipher_partitions.first : scope
-        code = code.nil? ? native_cipher_partitions.last : code
+        scope = native_cipher_partitions.first if scope == true
+        code = native_cipher_partitions.last if code.nil?
 
         [scope, code].reject { |part| part.nil? || part.empty? }.join('.')
       end
@@ -24,7 +24,7 @@ module Aux
       # @param subject [ClassName]
       # @return [String]
       def self.dependency_native_cipher(subject)
-        subject.dup.gsub(/::/, '.').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase
+        subject.dup.gsub('::', '.').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase
       end
     end
   end
