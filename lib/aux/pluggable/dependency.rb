@@ -3,6 +3,7 @@
 module Aux
   module Pluggable
     # Describes the dependency and its preferences
+    # @!visibility private
     class Dependency
       # @!attribute [r] target
       #   @return [Object]

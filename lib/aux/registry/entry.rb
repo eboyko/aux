@@ -11,7 +11,7 @@ module Aux
         @constructor = constructor
         @memoization_required = memoization_required
 
-        @mutex = ::Mutex.new
+        @mutex = Thread::Mutex.new
       end
 
       # @return [Object]

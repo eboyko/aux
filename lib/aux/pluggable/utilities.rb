@@ -3,6 +3,7 @@
 module Aux
   module Pluggable
     # Random methods for internal usage
+    # @!visibility private
     module Utilities
       # First, we need to determine the appropriate namespace (also called the scope) in which to resolve something.
       # By default, we assume that the developers want to resolve a dependency from the same namespace as the
@@ -21,7 +22,7 @@ module Aux
         [scope, code].reject { |part| part.nil? || part.empty? }.join('.')
       end
 
-      # @param subject [ClassName]
+      # @param subject [String]
       # @return [String]
       def self.dependency_native_cipher(subject)
         subject.dup.gsub('::', '.').gsub(/([A-Z]+)([A-Z][a-z])/, '\1_\2').gsub(/([a-z\d])([A-Z])/, '\1_\2').downcase

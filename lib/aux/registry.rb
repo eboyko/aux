@@ -11,13 +11,14 @@ module Aux
     end
 
     # @param key [Symbol, String]
-    # @param memoize [TrueClass, FalseClass, NilClass]
+    # @param memoize [TrueClass, FalseClass]
     # @param constructor [Proc]
     def register(key, memoize: false, &constructor)
       @prototypes.put(key.to_s, Entry.new(constructor, memoize))
     end
 
     # @param key [Symbol, String]
+    # @return [Object]
     def resolve(key)
       @prototypes.fetch(key.to_s).call
     end

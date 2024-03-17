@@ -3,6 +3,7 @@
 module Aux
   module Pluggable
     # Describes the bridge between a pluggable class and the registry
+    # @!visibility private
     class Connector
       # @!attribute [r] dependencies
       #   @return [Array<Dependency>]
