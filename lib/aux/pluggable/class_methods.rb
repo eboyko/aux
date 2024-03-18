@@ -52,24 +52,19 @@ module Aux
 
       # @param initialize [TrueClass, FalseClass]
       # @param memoize [TrueClass, FalseClass]
-      # @param scope [TrueClass, Symbol, String, nil]
+      # @param scope [Symbol, String, TrueClass, nil]
       # @param as [Symbol, String, nil]
       def register(initialize: false, memoize: false, scope: true, as: nil)
-        @_pluggable.register(
-          initialization_required: initialize,
-          memoization_required: memoize,
-          namespace: scope,
-          code: as
-        )
+        @_pluggable.register(initialize, memoize, scope, as)
       end
 
       # @param code [Symbol, String]
-      # @param initialization_block [Block]
+      # @param initialization_block [Proc, nil]
       # @param scope [TrueClass, Symbol, String, nil]
       # @param private [TrueClass, FalseClass]
       # @param as [Symbol, String, nil]
       def resolve(code, initialization_block = nil, scope: true, private: true, as: nil)
-        @_pluggable.resolve(code, initialization_block, namespace: scope, private: private, as: as)
+        @_pluggable.resolve(code, scope, private, as, initialization_block)
       end
     end
   end
