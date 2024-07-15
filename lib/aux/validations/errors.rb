@@ -1,134 +1,127 @@
 # frozen_string_literal: true
 
+require 'active_support/core_ext/string/inflections'
 require 'aux/validations/error'
-require 'aux/validations/errors_tree_presenter'
+require 'aux/validations/error_tree_presenter'
 
 module Aux
   module Validations
-    # Describes a batch of errors that can be initialized using an attribute name or an object that should be validated
+    # Provides methods to handle an element payload
     class Errors
-      # @!attribute [r] scope
-      #   @return [String, nil]
       # @!attribute [r] attribute
-      #   @return [Symbol, nil]
-      attr_reader :scope, :attribute
+      #   @return [Symbol]
+      # @!attribute [r] scope
+      #   @return [String]
+      attr_reader :attribute, :scope
 
-      # @overload initialize(subject)
+      # @overload initialize(base)
       #   @param base [Object]
-      #   @return [self]
-      # @overload initialize(attribute, errors)
-      #   Use this approach to handle nested errors
-      #   @param attribute [Symbol]
-      #   @param errors [Aux::Validation::Errors]
-      #   @return [self]
-      def initialize(base, errors = [])
-        @scope = base.is_a?(Symbol) ? nil : base.class.name.underscore.tr('/', '.')
-        @attribute = base.is_a?(Symbol) ? base : nil
-        @errors = errors
+      # @overload initialize(base, errors)
+      #   @param base [Symbol] attribute name
+      #   @param errors [Errors, nil] previous errors if any
+      def initialize(base, errors = nil)
+        if base.is_a?(Symbol)
+          @attribute = base
+          @scope = errors&.scope
+          @collection = errors.nil? ? [] : [errors]
+        else
+          @attribute = nil
+          @scope = base.class.name.underscore.tr('/', '.')
+          @collection = []
+        end
       end
 
       # @overload add(attribute, type, **details)
       #   @param attribute [Symbol]
-      #   @param type [Symbol]
-      #   @param details [Hash]
-      #   @raise [StandardError]
+      #   @param type [Symbol, nil]
+      #   @param details [Hash, nil]
       # @overload add(attribute, errors)
       #   @param attribute [Symbol]
-      #   @param errors [Array<Aux::Validations::Errors, Aux::Validations::Error>]
-      #   @raise [StandardError]
-      # @overload add(attribute, errors)
-      #   @param attribute [Symbol]
-      #   @param errors [Aux::Validations::Errors]
-      #   @raise [StandardError]
-      def add(attribute, payload, **details)
-        case payload
+      #   @param errors [Error, Errors, Array<Error, Errors>]
+      def add(attribute, type = :invalid, **details)
+        case type
         when Symbol
-          add_error(attribute, payload, **details)
+          @collection.push(Error.new(attribute, @scope, type, **details))
+        when Errors
+          @collection.push(Errors.new(attribute, type))
         when Array
-          add_nested_error(attribute, payload)
-        when Aux::Validations::Errors
-          add_nested_error(attribute, [payload])
+          type.each { |payload| add(attribute, payload) }
         else
-          raise StandardError, :unsupported_type
+          raise(ArgumentError, "Unsupported argument given (#{type.class})")
         end
       end
 
-      # @return [Hash]
-      def tree
-        tree_presenter.render(self)
-      end
-
-      # @return [Hash]
-      def group_by_attribute
-        errors.group_by(&:attribute)
-      end
-
       def clear
-        self.errors = []
+        @collection = []
       end
 
       # @return [Boolean]
       def empty?
-        errors.empty?
+        @collection.empty?
       end
 
-      def map(&block)
-        errors.map(&block)
+      # @overload include?(*attributes)
+      #   @param attributes [Array<Symbol>]
+      #   @return [TrueClass, FalseClass]
+      #
+      # @overload include?(**criteria)
+      #   @param criteria [Hash<Symbol, Symbol>]
+      #   @return [TrueClass, FalseClass]
+      def include?(*attributes, **criteria)
+        if attributes.any?
+          include_attributes?(*attributes)
+        elsif criteria.any?
+          include_criteria_match?(**criteria)
+        end
       end
 
-      # @return [Array<Aux::Validations::Error>]
+      # @return [Array<Error, Errors>]
       def all
-        errors.map do |error|
-          if error.is_a?(Array)
-            error.map { |e| e.respond_to?(:all) ? e.all : e }
-          else
-            error.respond_to?(:all) ? error.all : error
-          end
-        end.flatten
+        @collection
+      end
+
+      # @return [Hash{Symbol => Array<Error, Errors>}]
+      def group_by_attribute
+        @collection.group_by(&:attribute)
+      end
+
+      # @param block [Proc]
+      # @return [Array]
+      def map(&block)
+        @collection.map(&block)
+      end
+
+      # @return [Hash]
+      def tree
+        ErrorTreePresenter.render(self)
       end
 
       private
 
-      # @!attribute [rw] errors
-      #   @return [Array<Aux::Validations::Errors, Aux::Validations::Error>]
-      attr_accessor :errors
+      # @param attributes [Array<Hash>]
+      # @return [TrueClass, FalseClass]
+      def include_attributes?(*attributes)
+        match_count = @collection.count do |element|
+          return false unless attributes.include?(element.attribute)
 
-      # @param attribute [Symbol]
-      # @param type [Symbol]
-      # @param details [Hash]
-      def add_error(attribute, type, **details)
-        errors.push(build_error(attribute, type, **details))
+          true
+        end
+
+        match_count == attributes.count
       end
 
-      # @param attribute [Symbol]
-      # @param nested_errors [Aux::Validations::Errors]
-      def add_nested_error(attribute, nested_errors)
-        errors.push(build_nested_error(attribute, nested_errors))
-      end
+      # @param criteria [Hash<Symbol, Symbol>]
+      # @return [TrueClass, FalseClass]
+      def include_criteria_match?(**criteria)
+        attributes, types = criteria.to_a.transpose
 
-      # @param attribute [Symbol]
-      # @param type [Symbol]
-      # @param details [Hash]
-      # @return [Aux::Validations::Error]
-      def build_error(attribute, type, **details)
-        errors_factory.new(attribute, type, scope, **details)
-      end
+        match_count = @collection.count do |element|
+          return false unless attributes.include?(element.attribute) && types.include?(element.type)
 
-      # @param attribute [Symbol] 3
-      # @param errors [Aux::Validations::Errors]
-      # @return [Aux::Validations::Errors]
-      def build_nested_error(attribute, errors)
-        self.class.new(attribute, errors)
-      end
+          true
+        end
 
-      # @return [Class<Aux::Validations::ErrorsTreePresenter>]
-      def tree_presenter
-        Aux::Validations::ErrorsTreePresenter
-      end
-
-      # @return [Class<Aux::Validations::Error>]
-      def errors_factory
-        Aux::Validations::Error
+        match_count == criteria.count
       end
     end
   end
