@@ -1,69 +1,59 @@
 # frozen_string_literal: true
 
-require 'active_support/core_ext/string/inflections'
-require 'aux/validations/error'
-require 'aux/validations/error_tree_presenter'
-
 module Aux
   module Validations
-    # Provides methods to handle an element payload
+    # Describes a collection of errors that can be initialized with an attribute name or an object to be validated
     class Errors
-      # @!attribute [r] attribute
-      #   @return [Symbol]
       # @!attribute [r] scope
-      #   @return [String]
-      attr_reader :attribute, :scope
+      #   @return [String, nil]
+      # @!attribute [r] attribute
+      #   @return [Symbol, nil]
+      attr_reader :scope, :attribute
 
-      # @overload initialize(base)
-      #   @param base [Object]
-      # @overload initialize(base, errors)
-      #   @param base [Symbol] attribute name
-      #   @param errors [Errors, nil] previous errors if any
-      def initialize(base, errors = nil)
-        if base.is_a?(Symbol)
-          @attribute = base
-          @scope = errors&.scope
-          @collection = errors.nil? ? [] : [errors]
-        else
-          @attribute = nil
-          @scope = base.class.name.underscore.tr('/', '.')
-          @collection = []
-        end
+      # @overload initialize(subject)
+      #   @param subject [Object]
+      # @overload initialize(attribute, errors)
+      #   @param attribute [Symbol]
+      #   @param errors [Errors]
+      def initialize(subject, errors = [])
+        @scope = subject.is_a?(Symbol) ? nil : subject.class.name.underscore.tr('/', '.')
+        @attribute = subject.is_a?(Symbol) ? subject : nil
+        @errors = errors
       end
 
       # @overload add(attribute, type, **details)
       #   @param attribute [Symbol]
-      #   @param type [Symbol, nil]
-      #   @param details [Hash, nil]
+      #   @param type [Symbol]
+      #   @param details [Hash]
+      #   @raise [StandardError]
       # @overload add(attribute, errors)
       #   @param attribute [Symbol]
-      #   @param errors [Error, Errors, Array<Error, Errors>]
-      def add(attribute, type = :invalid, **details)
-        case type
+      #   @param errors [Array<Errors, Error>]
+      #   @raise [StandardError]
+      # @overload add(attribute, errors)
+      #   @param attribute [Symbol]
+      #   @param errors [Errors]
+      #   @raise [StandardError]
+      def add(attribute, subject, **details)
+        case subject
         when Symbol
-          @collection.push(Error.new(attribute, @scope, type, **details))
-        when Errors
-          @collection.push(Errors.new(attribute, type))
+          add_error(attribute, subject, **details)
         when Array
-          type.each { |payload| add(attribute, payload) }
+          add_nested_error(attribute, subject)
+        when Errors
+          add_nested_error(attribute, [subject])
         else
-          raise(ArgumentError, "Unsupported argument given (#{type.class})")
+          raise(ArgumentError, "Unsupported argument given (#{subject.class})")
         end
       end
 
       def clear
-        @collection = []
-      end
-
-      # @return [Boolean]
-      def empty?
-        @collection.empty?
+        self.errors = []
       end
 
       # @overload include?(*attributes)
       #   @param attributes [Array<Symbol>]
       #   @return [TrueClass, FalseClass]
-      #
       # @overload include?(**criteria)
       #   @param criteria [Hash<Symbol, Symbol>]
       #   @return [TrueClass, FalseClass]
@@ -75,34 +65,60 @@ module Aux
         end
       end
 
-      # @return [Array<Error, Errors>]
-      def all
-        @collection
-      end
-
-      # @return [Hash{Symbol => Array<Error, Errors>}]
-      def group_by_attribute
-        @collection.group_by(&:attribute)
+      # @return [Boolean]
+      def empty?
+        errors.empty?
       end
 
       # @param block [Proc]
-      # @return [Array]
       def map(&block)
-        @collection.map(&block)
+        errors.map(&block)
       end
 
-      # @return [Hash]
-      def tree
-        ErrorTreePresenter.render(self)
+      # @return [Hash<Symbol, Array>]
+      def group_by_attribute
+        errors.group_by(&:attribute)
       end
 
       private
 
-      # @param attributes [Array<Hash>]
+      # @!attribute [rw] errors
+      #   @return [Array<Error, Errors>]
+      attr_accessor :errors
+
+      # @param attribute [Symbol]
+      # @param type [Symbol]
+      # @param details [Hash]
+      def add_error(attribute, type, **details)
+        errors.push(build_error(attribute, type, **details))
+      end
+
+      # @param attribute [Symbol]
+      # @param nested_errors [Errors]
+      def add_nested_error(attribute, nested_errors)
+        errors.push(build_nested_error(attribute, nested_errors))
+      end
+
+      # @param attribute [Symbol]
+      # @param type [Symbol]
+      # @param details [Hash]
+      # @return [Error]
+      def build_error(attribute, type, **details)
+        factory.new(attribute, scope, type, **details)
+      end
+
+      # @param attribute [Symbol] 3
+      # @param errors [Errors]
+      # @return [Errors]
+      def build_nested_error(attribute, errors)
+        self.class.new(attribute, errors)
+      end
+
+      # @param attributes [Array<Symbol, Hash>]
       # @return [TrueClass, FalseClass]
       def include_attributes?(*attributes)
-        match_count = @collection.count do |element|
-          return false unless attributes.include?(element.attribute)
+        match_count = errors.count do |error|
+          return false unless attributes.include?(error.attribute)
 
           true
         end
@@ -115,13 +131,18 @@ module Aux
       def include_criteria_match?(**criteria)
         attributes, types = criteria.to_a.transpose
 
-        match_count = @collection.count do |element|
-          return false unless attributes.include?(element.attribute) && types.include?(element.type)
+        match_count = errors.count do |error|
+          return false unless attributes.include?(error.attribute) && types.include?(error.type)
 
           true
         end
 
         match_count == criteria.count
+      end
+
+      # @return [Class<Error>]
+      def factory
+        Error
       end
     end
   end

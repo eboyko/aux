@@ -22,7 +22,7 @@ module Aux
         @attribute = attribute
         @scope = scope
         @type = type
-        @details = details.any? ? details : nil
+        @details = details
       end
     end
   end
