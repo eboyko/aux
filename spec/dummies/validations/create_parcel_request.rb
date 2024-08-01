@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'aux/validations'
+
 class CreateParcelRequest
   include Aux::Validations
 

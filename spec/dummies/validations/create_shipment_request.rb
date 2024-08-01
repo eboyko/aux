@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aux/validations'
 require 'dummies/validations/create_parcel_request'
 
