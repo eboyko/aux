@@ -20,7 +20,7 @@ module Aux
 
         # Configure dependencies that come from the registry
         pluggable.dependencies.each do |dependency|
-          instance.instance_variable_set("@#{dependency.pointer}", dependency.target)
+          instance.instance_variable_set(:"@#{dependency.pointer}", dependency.target)
 
           # The next lines are required to make resolved dependencies available
           # by its reader methods within customized initialization
@@ -28,7 +28,7 @@ module Aux
           # TODO: Discuss whether this is appropriate behaviour
           next if instance.respond_to?(dependency.pointer, true)
 
-          define_method(dependency.pointer) { instance_variable_get("@#{dependency.pointer}") }
+          define_method(dependency.pointer) { instance_variable_get(:"@#{dependency.pointer}") }
           next unless dependency.private
 
           private(dependency.pointer)
@@ -37,7 +37,7 @@ module Aux
         # Configure dependencies that come from the customized initialization procedure
         dependencies_overrides = keyword_arguments.slice(*dependencies_keys)
         dependencies_overrides.each do |pointer, target|
-          instance.instance_variable_set("@#{pointer}", target)
+          instance.instance_variable_set(:"@#{pointer}", target)
         end
 
         # Run the origin's initialization procedure if any other arguments given

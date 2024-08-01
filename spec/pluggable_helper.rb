@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/inflector'
 require 'aux/pluggable'
 require 'zeitwerk'

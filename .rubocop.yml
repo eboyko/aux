@@ -1,10 +1,17 @@
+require:
+  - rubocop-rake
+  - rubocop-performance
+  - rubocop-rspec
+
 AllCops:
   TargetRubyVersion: 2.7
   NewCops: enable
   Exclude:
     - Gemfile
     - aux.gemspec
-    - spec/**/*
 
 Layout/LineLength:
   Max: 120
+
+RSpec/MultipleExpectations:
+  Enabled: false

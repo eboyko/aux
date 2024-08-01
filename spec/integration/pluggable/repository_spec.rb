@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'pluggable_helper'
 
 RSpec.describe(Repository) do
-  include_context 'with pluggable registry'
-
   subject(:repository) { registry.resolve(:repository) }
+
+  include_context 'with pluggable registry'
 
   let(:settings) { registry.resolve(:settings) }
 

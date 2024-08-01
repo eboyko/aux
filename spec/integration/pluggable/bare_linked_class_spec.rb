@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pluggable_helper'
 
 RSpec.describe(BareLinkedClass) do

@@ -1,8 +1,8 @@
+# frozen_string_literal: true
+
 require 'pluggable_helper'
 
 RSpec.describe(AdvancedService) do
-  include_context 'with pluggable registry'
-
   subject(:service) do
     described_class.new(
       user,
@@ -10,8 +10,12 @@ RSpec.describe(AdvancedService) do
     )
   end
 
+  include_context 'with pluggable registry'
+
+  # rubocop:disable RSpec/VerifiedDoubles
   let(:user) { double(:user) }
   let(:filters) { double(:filters) }
+  # rubocop:enable RSpec/VerifiedDoubles
 
   it 'returns successfully initialized instance' do
     expect(service.user).to be(user)
