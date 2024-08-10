@@ -81,7 +81,7 @@ module Aux
         {
           type: error.type,
           details: error.details,
-          format_message: format_message(error, scope)
+          message: format_message(error, scope)
         }
       end
 
