@@ -98,7 +98,7 @@ module Aux
         I18n.translate(
           error.type,
           scope: "#{self.class::DEFAULT_ERROR_SCOPE_PREFIX}.#{error.scope}.#{error.attribute}",
-          default: format_fallback_message(error),
+          default: proc { format_fallback_message(error) },
           **error.details
         )
       end
@@ -110,7 +110,7 @@ module Aux
         I18n.translate(
           error.type,
           scope: "#{self.class::DEFAULT_ERROR_SCOPE_PREFIX}.#{scope}.#{error.attribute}",
-          default: format_primary_message(error),
+          default: proc { format_primary_message(error) },
           **error.details
         )
       end
