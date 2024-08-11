@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Preload shared contexts and examples
 Dir["#{__dir__}/support/**/*.rb"].sort.each { |file| require(file) }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pluggable_helper'
 
 RSpec.describe(Service) do
@@ -9,8 +11,8 @@ RSpec.describe(Service) do
       )
     end
 
-    let(:repository) { double(:repository) }
-    let(:settings) { double(:settings) }
+    let(:repository) { instance_double(Repository) }
+    let(:settings) { instance_double(Settings) }
 
     it 'returns successfully initialized instance' do
       expect(service.repository).to be(repository)

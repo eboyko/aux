@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-require 'aux/validations/error'
-require 'aux/validations/errors_tree_presenter'
-
 module Aux
   module Validations
-    # Describes a batch of errors that can be initialized using an attribute name or an object that should be validated
+    # Describes a collection of errors that can be initialized with an attribute name or an object to be validated
     class Errors
       # @!attribute [r] scope
       #   @return [String, nil]
@@ -14,16 +11,13 @@ module Aux
       attr_reader :scope, :attribute
 
       # @overload initialize(subject)
-      #   @param base [Object]
-      #   @return [self]
+      #   @param subject [Object]
       # @overload initialize(attribute, errors)
-      #   Use this approach to handle nested errors
       #   @param attribute [Symbol]
-      #   @param errors [Aux::Validation::Errors]
-      #   @return [self]
-      def initialize(base, errors = [])
-        @scope = base.is_a?(Symbol) ? nil : base.class.name.underscore.tr('/', '.')
-        @attribute = base.is_a?(Symbol) ? base : nil
+      #   @param errors [Errors]
+      def initialize(subject, errors = [])
+        @scope = subject.is_a?(Symbol) ? nil : subject.class.name.underscore.tr('/', '.')
+        @attribute = subject.is_a?(Symbol) ? subject : nil
         @errors = errors
       end
 
@@ -34,33 +28,23 @@ module Aux
       #   @raise [StandardError]
       # @overload add(attribute, errors)
       #   @param attribute [Symbol]
-      #   @param errors [Array<Aux::Validations::Errors, Aux::Validations::Error>]
+      #   @param errors [Array<Errors, Error>]
       #   @raise [StandardError]
       # @overload add(attribute, errors)
       #   @param attribute [Symbol]
-      #   @param errors [Aux::Validations::Errors]
+      #   @param errors [Errors]
       #   @raise [StandardError]
-      def add(attribute, payload, **details)
-        case payload
+      def add(attribute, subject, **details)
+        case subject
         when Symbol
-          add_error(attribute, payload, **details)
+          add_error(attribute, subject, **details)
         when Array
-          add_nested_error(attribute, payload)
-        when Aux::Validations::Errors
-          add_nested_error(attribute, [payload])
+          add_nested_error(attribute, subject)
+        when Errors
+          add_nested_error(attribute, [subject])
         else
-          raise StandardError, :unsupported_type
+          raise(ArgumentError, "Unsupported argument given (#{subject.class})")
         end
-      end
-
-      # @return [Hash]
-      def tree
-        tree_presenter.render(self)
-      end
-
-      # @return [Hash]
-      def group_by_attribute
-        errors.group_by(&:attribute)
       end
 
       def clear
@@ -72,25 +56,20 @@ module Aux
         errors.empty?
       end
 
+      # @param block [Proc]
       def map(&block)
         errors.map(&block)
       end
 
-      # @return [Array<Aux::Validations::Error>]
-      def all
-        errors.map do |error|
-          if error.is_a?(Array)
-            error.map { |e| e.respond_to?(:all) ? e.all : e }
-          else
-            error.respond_to?(:all) ? error.all : error
-          end
-        end.flatten
+      # @return [Hash<Symbol, Array>]
+      def group_by_attribute
+        errors.group_by(&:attribute)
       end
 
       private
 
       # @!attribute [rw] errors
-      #   @return [Array<Aux::Validations::Errors, Aux::Validations::Error>]
+      #   @return [Array<Error, Errors>]
       attr_accessor :errors
 
       # @param attribute [Symbol]
@@ -101,7 +80,7 @@ module Aux
       end
 
       # @param attribute [Symbol]
-      # @param nested_errors [Aux::Validations::Errors]
+      # @param nested_errors [Errors]
       def add_nested_error(attribute, nested_errors)
         errors.push(build_nested_error(attribute, nested_errors))
       end
@@ -109,26 +88,21 @@ module Aux
       # @param attribute [Symbol]
       # @param type [Symbol]
       # @param details [Hash]
-      # @return [Aux::Validations::Error]
+      # @return [Error]
       def build_error(attribute, type, **details)
-        errors_factory.new(attribute, type, scope, **details)
+        factory.new(attribute, scope, type, **details)
       end
 
       # @param attribute [Symbol] 3
-      # @param errors [Aux::Validations::Errors]
-      # @return [Aux::Validations::Errors]
+      # @param errors [Errors]
+      # @return [Errors]
       def build_nested_error(attribute, errors)
         self.class.new(attribute, errors)
       end
 
-      # @return [Class<Aux::Validations::ErrorsTreePresenter>]
-      def tree_presenter
-        Aux::Validations::ErrorsTreePresenter
-      end
-
-      # @return [Class<Aux::Validations::Error>]
-      def errors_factory
-        Aux::Validations::Error
+      # @return [Class<Error>]
+      def factory
+        Error
       end
     end
   end

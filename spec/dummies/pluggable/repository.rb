@@ -4,5 +4,5 @@ class Repository
   include Aux::Pluggable
 
   register(initialize: true, memoize: true)
-  resolve(:settings, -> (settings) { settings.database_details }, private: false)
+  resolve(:settings, lambda(&:database_details), private: false)
 end

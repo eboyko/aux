@@ -6,6 +6,6 @@ class Settings
   register(initialize: false, memoize: false)
 
   def self.database_details
-    @database_scope ||= { address: '127.0.0.1' }
+    @database_details ||= { address: '127.0.0.1' }
   end
 end

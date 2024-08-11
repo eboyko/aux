@@ -6,22 +6,22 @@ module Aux
     class Error
       # @!attribute [r] attribute
       #   @return [Symbol]
-      # @!attribute [r] type
-      #   @return [Symbol]
       # @!attribute [r] scope
       #   @return [String]
+      # @!attribute [r] type
+      #   @return [Symbol]
       # @!attribute [r] details
       #   @return [Hash]
-      attr_reader :attribute, :type, :scope, :details
+      attr_reader :attribute, :scope, :type, :details
 
       # @param attribute [Symbol]
-      # @param type [Symbol]
       # @param scope [String]
+      # @param type [Symbol]
       # @param details [Hash]
-      def initialize(attribute, type, scope, **details)
+      def initialize(attribute, scope, type, **details)
         @attribute = attribute
-        @type = type
         @scope = scope
+        @type = type
         @details = details
       end
     end

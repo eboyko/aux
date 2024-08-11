@@ -45,13 +45,13 @@ module Aux
 
         if @initialization_required
           @subject.class_eval do
-            define_method(dependency.pointer) { instance_variable_get("@#{dependency.pointer}") }
+            define_method(dependency.pointer) { instance_variable_get(:"@#{dependency.pointer}") }
             private(dependency.pointer) if dependency.private
           end
         else
-          @subject.instance_variable_set("@#{dependency.pointer}", dependency.target)
+          @subject.instance_variable_set(:"@#{dependency.pointer}", dependency.target)
           @subject.singleton_class.class_eval do
-            define_method(dependency.pointer) { instance_variable_get("@#{dependency.pointer}") }
+            define_method(dependency.pointer) { instance_variable_get(:"@#{dependency.pointer}") }
             private(dependency.pointer) if dependency.private
           end
         end

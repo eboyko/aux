@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
+require 'active_model'
 require 'active_support'
-require 'active_model/validations/validates'
+require 'aux/validations/error'
 require 'aux/validations/errors'
+require 'aux/validations/error_handler'
 
 module Aux
   # Describes enhancement of {::ActiveModel::Validations}
