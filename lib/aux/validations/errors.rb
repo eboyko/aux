@@ -51,20 +51,6 @@ module Aux
         self.errors = []
       end
 
-      # @overload include?(*attributes)
-      #   @param attributes [Array<Symbol>]
-      #   @return [TrueClass, FalseClass]
-      # @overload include?(**criteria)
-      #   @param criteria [Hash<Symbol, Symbol>]
-      #   @return [TrueClass, FalseClass]
-      def include?(*attributes, **criteria)
-        if attributes.any?
-          include_attributes?(*attributes)
-        elsif criteria.any?
-          include_criteria_match?(**criteria)
-        end
-      end
-
       # @return [Boolean]
       def empty?
         errors.empty?
@@ -112,32 +98,6 @@ module Aux
       # @return [Errors]
       def build_nested_error(attribute, errors)
         self.class.new(attribute, errors)
-      end
-
-      # @param attributes [Array<Symbol, Hash>]
-      # @return [TrueClass, FalseClass]
-      def include_attributes?(*attributes)
-        match_count = errors.count do |error|
-          return false unless attributes.include?(error.attribute)
-
-          true
-        end
-
-        match_count == attributes.count
-      end
-
-      # @param criteria [Hash<Symbol, Symbol>]
-      # @return [TrueClass, FalseClass]
-      def include_criteria_match?(**criteria)
-        attributes, types = criteria.to_a.transpose
-
-        match_count = errors.count do |error|
-          return false unless attributes.include?(error.attribute) && types.include?(error.type)
-
-          true
-        end
-
-        match_count == criteria.count
       end
 
       # @return [Class<Error>]

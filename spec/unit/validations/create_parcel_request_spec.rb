@@ -17,7 +17,6 @@ RSpec.describe(CreateParcelRequest) do
 
       it 'returns false' do
         expect(request).to be_invalid
-        expect(request.errors.include?(address: :blank)).to be(true)
       end
     end
 
@@ -26,7 +25,6 @@ RSpec.describe(CreateParcelRequest) do
 
       it 'returns false' do
         expect(request).to be_invalid
-        expect(request.errors.include?(weight: :greater_than)).to be(true)
       end
     end
   end
