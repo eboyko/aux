@@ -3,7 +3,7 @@ require_relative 'lib/aux/version'
 Gem::Specification.new do |specification|
   specification.name = 'aux'
   specification.version = Aux::VERSION
-  specification.summary = 'Supplementary tools for more effective development'
+  specification.summary = 'First-aid kit for growing projects'
   specification.files = Dir['MIT-LICENSE', 'README.md', 'aux.gemspec', 'lib/**/*']
 
   specification.authors = ['Evgeny Boyko']
