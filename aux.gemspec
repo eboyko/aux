@@ -10,7 +10,7 @@ Gem::Specification.new do |specification|
   specification.email = ['eboyko@eboyko.ru']
   specification.homepage = 'https://github.com/eboyko/aux'
 
-  specification.add_dependency 'concurrent-ruby', '~> 1.2', '>= 1.2.3'
+  specification.add_dependency 'concurrent-ruby', '~> 1.2', '< 1.4'
   specification.add_dependency 'activemodel', '>= 6.1', '< 9'
 
   specification.required_ruby_version = '>= 2.7.1'
