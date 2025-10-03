@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+
 git_source(:github) { |repository| "https://github.com/#{repository}.git" }
 
 # Specify dependencies in gemspec file
@@ -9,7 +10,6 @@ group :test do
 end
 
 group :documentation do
-  gem 'redcarpet', platform: :mri
   gem 'yard'
   gem 'yard-junk'
 end
