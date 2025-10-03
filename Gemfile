@@ -16,10 +16,3 @@ group :test do
   gem 'rubocop-rake', require: false
   gem 'rubocop-rspec', require: false
 end
-
-group :documentation do
-  gem 'redcarpet', platform: :mri
-
-  # Use annotations and interactive documentation
-  gem 'yard', '>= 0.9.36', require: false
-end
