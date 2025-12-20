@@ -38,9 +38,15 @@ module Aux
       # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       def resolve(code, namespace, private, as, initialization_block = nil)
         cipher = Utilities.dependency_cipher(@subject.name, namespace, code)
-        load_class(cipher)
+        load_class(cipher) unless @registry.key?(cipher)
 
-        dependency = Dependency.new(@registry.resolve(cipher), as || code, private, initialization_block)
+        target =
+          if initialization_block
+            -> { initialization_block.call(@registry.resolve(cipher)) }
+          else
+            -> { @registry.resolve(cipher) }
+          end
+        dependency = Dependency.new(target, as || code, private, initialization_block)
         @dependencies.push(dependency)
 
         if @initialization_required
