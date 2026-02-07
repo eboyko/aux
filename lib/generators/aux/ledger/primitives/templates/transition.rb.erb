@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+module Ledger
+  class Transition < ApplicationRecord
+    # @!attribute [rw] process
+    #   @return [Process]
+    belongs_to :process, class_name: 'Process'
+
+    # @!attribute [rw] previous_state
+    #   @return [State, nil]
+    belongs_to :previous_state, class_name: 'State', optional: true
+
+    # @!attribute [rw] following_state
+    #   @return [State]
+    belongs_to :following_state, class_name: 'State'
+
+    # @return [String]
+    def cipher
+      "#{process.code}.#{code}"
+    end
+  end
+end

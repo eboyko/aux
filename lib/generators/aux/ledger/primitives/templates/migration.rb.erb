@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+class CreateLedgerPrimitives < ActiveRecord::Migration <%= migration_version %>
+  def change
+    create_table(:ldg_processes) do |column|
+      column.string(:code, null: false)
+      column.string(:title, null: false)
+    end
+
+    add_index(:ldg_processes, :code, unique: true, name: :ldg_processes_code_key)
+    add_index(:ldg_processes, :title, unique: true, name: :ldg_processes_title_key)
+
+    create_table(:ldg_states) do |column|
+      column.bigint(:process_id, null: false)
+      column.string(:code, null: false)
+      column.string(:title, null: false)
+    end
+
+    add_foreign_key(:ldg_states, :ldg_processes, column: :process_id, name: :ldg_states_process_fkey)
+    add_index(:ldg_states, %w[process_id code], unique: true, name: :ldg_states_process_code_key)
+    add_index(:ldg_states, %w[process_id title], unique: true, name: :ldg_states_process_title_key)
+
+    create_table(:ldg_transitions) do |column|
+      column.bigint(:process_id, null: false)
+      column.bigint(:previous_state_id)
+      column.bigint(:following_state_id, null: false)
+      column.string(:code, null: false)
+      column.string(:title, null: false)
+    end
+
+    add_foreign_key(:ldg_transitions, :ldg_processes, column: :process_id, name: :ldg_transitions_process_fkey)
+    add_foreign_key(:ldg_transitions, :ldg_states, column: :previous_state_id, name: :ldg_transitions_previous_state_fkey)
+    add_foreign_key(:ldg_transitions, :ldg_states, column: :following_state_id, name: :ldg_transitions_following_state_fkey)
+    add_index(:ldg_transitions, %w[process_id previous_state_id following_state_id], unique: true, name: :ldg_transitions_process_previous_state_following_state_key)
+  end
+end

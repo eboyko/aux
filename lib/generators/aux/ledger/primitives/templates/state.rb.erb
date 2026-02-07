@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+module Ledger
+  class State < ApplicationRecord
+    # @!method process
+    #   @return [Process]
+    belongs_to :process, class_name: 'Process'
+
+    # @!attribute [rw] previous_transitions
+    #   @return [ActiveRecord::Associations::CollectionProxy<Transition>]
+    has_many(
+      :previous_transitions,
+      class_name: 'Transition',
+      foreign_key: :following_state_id,
+      inverse_of: :following_state,
+      dependent: :restrict_with_error
+    )
+
+    # @!attribute [rw] following_transitions
+    #   @return [ActiveRecord::Associations::CollectionProxy<Transition>]
+    has_many(
+      :following_transitions,
+      class_name: 'Transition',
+      foreign_key: :previous_state_id,
+      inverse_of: :previous_state,
+      dependent: :restrict_with_error
+    )
+
+    # @return [Boolean]
+    def primary?
+      previous_transitions.first&.previous_state.blank?
+    end
+
+    # @return [Boolean]
+    def terminal?
+      following_transitions.none?
+    end
+  end
+end
