@@ -12,6 +12,7 @@ Gem::Specification.new do |specification|
 
   specification.add_dependency 'concurrent-ruby', '~> 1.2', '< 1.4'
   specification.add_dependency 'activemodel', '>= 6.1', '< 9'
+  specification.add_dependency 'activerecord', '>= 6.1', '< 9'
 
   specification.required_ruby_version = '>= 2.7.1'
   specification.metadata['rubygems_mfa_required'] = 'true'
