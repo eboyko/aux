@@ -12,12 +12,15 @@ module Aux
 
       source_root(File.expand_path('templates', __dir__))
 
-      def create_migration
-        migration_template('create_ledger_primitives.rb.erb', 'db/migrate/create_ledger_primitives.rb')
+      def create_migration_file
+        migration_template('migration.rb.erb', 'db/migrate/create_ledger_primitives.rb')
       end
 
-      def create_models
+      def create_module_file
         template('module.rb.erb', 'app/models/ledger.rb')
+      end
+
+      def create_model_files
         template('process.rb.erb', 'app/models/ledger/process.rb')
         template('state.rb.erb', 'app/models/ledger/state.rb')
         template('transition.rb.erb', 'app/models/ledger/transition.rb')
