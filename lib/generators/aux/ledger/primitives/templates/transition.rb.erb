@@ -3,16 +3,16 @@
 module Ledger
   class Transition < ApplicationRecord
     # @!attribute [rw] process
-    #   @return [Process]
-    belongs_to :process, class_name: 'Process'
+    #   @return [Ledger::Process]
+    belongs_to :process, class_name: 'Ledger::Process'
 
     # @!attribute [rw] previous_state
-    #   @return [State, nil]
-    belongs_to :previous_state, class_name: 'State', optional: true
+    #   @return [Ledger::State, nil]
+    belongs_to :previous_state, class_name: 'Ledger::State', optional: true
 
     # @!attribute [rw] following_state
-    #   @return [State]
-    belongs_to :following_state, class_name: 'State'
+    #   @return [Ledger::State]
+    belongs_to :following_state, class_name: 'Ledger::State'
 
     # @return [String]
     def cipher

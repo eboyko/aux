@@ -3,24 +3,24 @@
 module Ledger
   class State < ApplicationRecord
     # @!method process
-    #   @return [Process]
-    belongs_to :process, class_name: 'Process'
+    #   @return [Ledger::Process]
+    belongs_to :process, class_name: 'Ledger::Process'
 
     # @!attribute [rw] previous_transitions
-    #   @return [ActiveRecord::Associations::CollectionProxy<Transition>]
+    #   @return [ActiveRecord::Associations::CollectionProxy<Ledger::Transition>]
     has_many(
       :previous_transitions,
-      class_name: 'Transition',
+      class_name: 'Ledger::Transition',
       foreign_key: :following_state_id,
       inverse_of: :following_state,
       dependent: :restrict_with_error
     )
 
     # @!attribute [rw] following_transitions
-    #   @return [ActiveRecord::Associations::CollectionProxy<Transition>]
+    #   @return [ActiveRecord::Associations::CollectionProxy<Ledger::Transition>]
     has_many(
       :following_transitions,
-      class_name: 'Transition',
+      class_name: 'Ledger::Transition',
       foreign_key: :previous_state_id,
       inverse_of: :previous_state,
       dependent: :restrict_with_error
