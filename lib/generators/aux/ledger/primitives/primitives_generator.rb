@@ -20,6 +20,12 @@ module Aux
         template('module.rb.erb', 'app/models/ledger.rb')
       end
 
+      def create_concern_files
+        template('transactionable.rb.erb', 'app/models/concerns/ledger/transactionable.rb')
+        template('processable.rb.erb', 'app/models/concerns/ledger/processable.rb')
+        template('eventable.rb.erb', 'app/models/concerns/ledger/eventable.rb')
+      end
+
       def create_model_files
         template('process.rb.erb', 'app/models/ledger/process.rb')
         template('state.rb.erb', 'app/models/ledger/state.rb')

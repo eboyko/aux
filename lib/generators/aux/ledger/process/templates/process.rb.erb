@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+class <%= class_name %> < ApplicationRecord
+  include Ledger::Processable
+
+  # @!method process
+  #   @return [Ledger::Process]
+
+  # @!method state
+  #   @return [Ledger::State, nil]
+
+  # @!method [rw] <%= origin_name %>
+  #   @return [<%= origin_class_name %>]
+
+  # @!method [rw] events
+  #   @return [ActiveRecord::Associations::CollectionProxy<<%= event_class_name %>>]
+end

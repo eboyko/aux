@@ -10,6 +10,8 @@ module Aux
 
       desc 'Creates a process and its event models'
 
+      class_option(:origin, type: :string, required: true, desc: 'The origin model class for the process events')
+
       source_root(File.expand_path('templates', __dir__))
 
       def create_migration_file
@@ -39,8 +41,28 @@ module Aux
       end
 
       # @return [String]
+      def event_class_name
+        "#{class_name}Event"
+      end
+
+      # @return [String]
       def event_table_name
         "#{table_name.singularize}_events"
+      end
+
+      # @return [Class]
+      def origin_class_name
+        options[:origin].constantize
+      end
+
+      # @return [String]
+      def origin_name
+        options[:origin].demodulize.underscore
+      end
+
+      # @return [String]
+      def origin_table_name
+        origin_class_name.table_name
       end
 
       # @return [String]

@@ -11,20 +11,21 @@ class <%= migration_class_name %> < ActiveRecord::Migration <%= migration_versio
     add_foreign_key(:<%= table_name %>, :ldg_processes, column: :process_id, name: :<%= table_name %>_process_fkey)
     add_foreign_key(:<%= table_name %>, :ldg_states, column: :state_id, name: :<%= table_name %>_state_fkey)
 
-    # Consider adding of additional indexes
+    # Consider additional indexes
 
     create_table(:<%= event_table_name %>) do |column|
       column.bigint(:<%= process_name %>_id, null: false)
       column.bigint(:state_id, null: false)
-      column.bigint(:user_id, null: false)
+      column.bigint(:<%= origin_name %>_id, null: false)
       column.json(:payload)
       column.timestamps
     end
 
     add_foreign_key(:<%= event_table_name %>, :<%= table_name %>, column: :<%= process_name %>_id, name: :<%= event_table_name %>_<%= process_name %>_fkey)
+    add_foreign_key(:<%= event_table_name %>, :<%= origin_table_name %>, column: :<%= origin_name %>_id, name: :<%= event_table_name %>_<%= origin_name %>_fkey)
     add_foreign_key(:<%= event_table_name %>, :ldg_states, column: :state_id, name: :<%= event_table_name %>_state_fkey)
     add_index(:<%= event_table_name %>, :<%= process_name %>_id, name: :<%= event_table_name %>_<%= process_name %>_idx)
 
-    # Consider adding of additional indexes
+    # Consider additional indexes
   end
 end

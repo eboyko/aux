@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+module Ledger
+  module Eventable
+    # @param subject [ActiveRecord::Base]
+    def self.included(subject)
+      subject.belongs_to(:state, class_name: 'Ledger::State')
+      subject.belongs_to(:origin, class: 'Origin')
+    end
+  end
+end

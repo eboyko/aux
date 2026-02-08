@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+module Ledger
+  module Processable
+    include Transactionable
+
+    # @param subject [ActiveRecord::Base]
+    def self.included(subject)
+      subject.belongs_to(:process, class_name: 'Ledger::Process')
+      subject.belongs_to(:state, class_name: 'Ledger::State', optional: true)
+      subject.has_many(:events, -> { order(:id) }, class_name: "#{subject}Event", dependent: :restrict_with_exception)
+    end
+
+    # @return [ActiveRecord::Relation<Ledger::Transition>]
+    def available_transitions
+      process.transitions.where(previous_state: reload_state)
+    end
+
+    # @param transition_code [String]
+    # @param origin [Origin]
+    # @param payload [Hash]
+    # @raise [StandardError]
+    def run_transition!(transition_code, origin, **payload)
+      event = events.new(
+        state: available_transitions.find_by(code: transition_code).following_state,
+        origin: origin,
+        payload: payload.compact.presence
+      )
+
+      transaction do
+        event.save!
+        update!(state: event.state)
+      end
+
+      event
+    end
+  end
+end

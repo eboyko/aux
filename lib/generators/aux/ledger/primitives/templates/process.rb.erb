@@ -4,10 +4,10 @@ module Ledger
   class Process < ApplicationRecord
     # @!attribute [rw] states
     #   @return [ActiveRecord::Associations::CollectionProxy<Ledger::State>]
-    has_many :states, class_name: 'Ledger::State', dependent: :restrict_with_error
+    has_many :states, class_name: 'Ledger::State', dependent: :restrict_with_exception
 
     # @!attribute [rw] transitions
     #   @return [ActiveRecord::Associations::CollectionProxy<Ledger::Transition>]
-    has_many :transitions, class_name: 'Ledger::Transition', dependent: :restrict_with_error
+    has_many :transitions, class_name: 'Ledger::Transition', dependent: :restrict_with_exception
   end
 end

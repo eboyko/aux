@@ -1,0 +1,9 @@
+# frozen_string_literal: true
+
+class <%= event_class_name %> < ApplicationRecord
+  include Ledger::Eventable
+
+  # @!attribute [rw] <%= process_name %>
+  #   @return [<%= class_name %>]
+  belongs_to :<%= process_name %>, class_name: '<%= class_name %>'
+end
